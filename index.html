@@ -52,8 +52,39 @@
         }
 
         function generateMidi() {
-            
+            var track = new MidiWriter.Track();
+            const tempo = document.getElementById('tempo').value;
+            const duration = document.getElementById('duration').value;
+            track.setTempo(tempo);
+
+            const notes = document.querySelectorAll('[id^="noteContainer"]');
+            notes.forEach(noteContainer => {
+                let note = noteContainer.querySelector('select').value;
+                let times = parseInt(noteContainer.querySelector('[id^="times"]').value);
+                let beats = parseInt(noteContainer.querySelector('[id^="beats"]').value);
+                let noteDuration = parseInt(noteContainer.querySelector('[id^="duration"]').value);
+
+                for (let i = 0; i < times; i++) {
+                    track.addEvent(new MidiWriter.NoteEvent({pitch: [note], duration: `T${noteDuration}`, wait: `T${beats}`}), function(event, index) {
+                        return {sequential:true};
+                    });
+                }
+            });
+
+            var write = new MidiWriter.Writer([track]);
+            var dataUri = write.dataUri();
+            downloadMidi(dataUri);
         }
+
+        function downloadMidi(dataUri) {
+            var link = document.createElement('a');
+            link.href = dataUri;
+            link.download = 'polyrhythm.mid';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
     </script>
 </body>
 </html>
