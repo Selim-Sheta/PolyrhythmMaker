@@ -113,7 +113,6 @@
             const tempo = document.getElementById('tempo').value;
             const duration = document.getElementById('duration').value;
             track.setTempo(tempo);
-
             const notes = document.querySelectorAll('[id^="noteContainer"]');
             totalTime = tempo*duration/60;
             notes.forEach(noteContainer => {
@@ -125,11 +124,12 @@
 
                 let currentTime = 0;
                 let repetition = 0;
-                let noteEvents = [];
+                
                 while(currentTime < totalTime){
                     noteEvents.push(new MidiWriter.NoteEvent({
                         pitch: [note],
                         duration: `T${noteDuration}`,
+                        tick: currentTime,
                         wait: repetition === 0 ? 0 : `T${timeOffset}` // Only add wait time after the first note
                     }));
                     repetition += 1;
