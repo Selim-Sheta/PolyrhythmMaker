@@ -90,8 +90,16 @@
                     <option value="95">B6</option>
                     <option value="96">C7</option>
                 </select>
+                
                 <label for="duration${noteIndex}">of duration</label>
-                <input type="number" id="duration${noteIndex}" name="duration${noteIndex}" min="1" max="32" value="1" required>
+                <select id="duration${noteIndex}" name="duration${noteIndex}" value = "4" required>
+                    <option value="1">whole</option>
+                    <option value="2">half</option>
+                    <option value="d2">dotted half</option>
+                    <option value="dd2">double dotted half</option>
+                    <option value="4">quarter</option>
+                </select>
+
                 <label for="times${noteIndex}">must play</label>
                 <input type="number" id="times${noteIndex}" name="times${noteIndex}" min="1" max="100" required>
                 <label for="beats${noteIndex}">times within</label>
@@ -117,10 +125,10 @@
             totalTime = tempo*duration/60;
             let noteEvents = [];
             notes.forEach(noteContainer => {
-                let note = noteContainer.querySelector('select').value;
+                let note = noteContainer.querySelector('[id^="note"]').value;
                 let times = parseInt(noteContainer.querySelector('[id^="times"]').value);
                 let beats = parseInt(noteContainer.querySelector('[id^="beats"]').value);
-                let noteDuration = parseInt(noteContainer.querySelector('[id^="duration"]').value);
+                let noteDuration = noteContainer.querySelector('[id^="duration"]').value;
                 let timeOffset = beats/times;
 
                 let currentTime = 0;
@@ -129,7 +137,7 @@
                 while(currentTime < totalTime){
                     noteEvents.push(new MidiWriter.NoteEvent({
                         pitch: [note],
-                        duration: `T${128*noteDuration}`,
+                        duration: noteDuration,
                         tick: 128*currentTime,
                         velocity: 100,
                         channel: 1
