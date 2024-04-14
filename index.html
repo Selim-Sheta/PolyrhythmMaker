@@ -124,7 +124,7 @@
 
                 let currentTime = 0;
                 let repetition = 0;
-                
+                let noteEvents = [];
                 while(currentTime < totalTime){
                     noteEvents.push(new MidiWriter.NoteEvent({
                         pitch: [note],
