@@ -2,13 +2,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Polyrhythm Generator</title>
 </head>
 <body>
-    <h1>Lorem Ipsum</h1>
-    <p>Lorem Ipsum</p>
-    <p>Lorem Ipsum</p>
-    <p>Lorem Ipsum</p>
-    <p>Lorem Ipsum</p>
+    <h1>Polyrhythm Generator</h1>
+    
+    <form id="polyrhythmForm">
+        <div id="noteInputs"></div> <!-- Container for dynamic note inputs -->
+        
+        <button type="button" onclick="addNote()">Add Note</button>
+        
+        <h3>Global Settings</h3>
+        <label for="tempo">Tempo (BPM):</label>
+        <input type="number" id="tempo" name="tempo" value="120" min="1" max="300" required>
+
+        <label for="duration">Duration (seconds):</label>
+        <input type="number" id="duration" name="duration" value="30" min="1" max="600" required>
+
+        <button type="submit">Download MIDI</button>
+    </form>
+
+    <script>
+        function addNote() {
+            const container = document.getElementById('noteInputs');
+            const noteIndex = container.children.length + 1;
+            const noteDiv = document.createElement('div');
+            noteDiv.innerHTML = `
+                <h4>Note ${noteIndex}</h4>
+                <label for="note${noteIndex}">Note Pitch:</label>
+                <select id="note${noteIndex}" name="note${noteIndex}">
+                    <option value="63">D#5</option>
+                    <option value="55">G3</option>
+                    <option value="69">A4</option>
+                    <!-- Add other notes as needed -->
+                </select>
+                <label for="times${noteIndex}">Times (X):</label>
+                <input type="number" id="times${noteIndex}" name="times${noteIndex}" min="1" max="100" required>
+                <label for="beats${noteIndex}">Within Beats (Y):</label>
+                <input type="number" id="beats${noteIndex}" name="beats${noteIndex}" min="1" max="100" required>
+                <label for="duration${noteIndex}">Duration (Z - in beats):</label>
+                <input type="number" id="duration${noteIndex}" name="duration${noteIndex}" min="1" max="32" required>
+            `;
+            container.appendChild(noteDiv);
+        }
+    </script>
 </body>
 </html>
+
