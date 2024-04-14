@@ -28,10 +28,67 @@
             noteDiv.innerHTML = `
                 <label for="note${noteIndex}">Note</label>
                 <select id="note${noteIndex}" name="note${noteIndex}">
-                    <option value="63">D#5</option>
+                    <option value="36">C2</option>
+                    <option value="37">C#2/Db2</option>
+                    <option value="38">D2</option>
+                    <option value="39">D#2/Eb2</option>
+                    <option value="40">E2</option>
+                    <option value="41">F2</option>
+                    <option value="42">F#2/Gb2</option>
+                    <option value="43">G2</option>
+                    <option value="44">G#2/Ab2</option>
+                    <option value="45">A2</option>
+                    <option value="46">A#2/Bb2</option>
+                    <option value="47">B2</option>
+                    <option value="48">C3</option>
+                    <option value="49">C#3/Db3</option>
+                    <option value="50">D3</option>
+                    <option value="51">D#3/Eb3</option>
+                    <option value="52">E3</option>
+                    <option value="53">F3</option>
+                    <option value="54">F#3/Gb3</option>
                     <option value="55">G3</option>
+                    <option value="56">G#3/Ab3</option>
+                    <option value="57">A3</option>
+                    <option value="58">A#3/Bb3</option>
+                    <option value="59">B3</option>
+                    <option value="60">C4 (Middle C)</option>
+                    <option value="61">C#4/Db4</option>
+                    <option value="62">D4</option>
+                    <option value="63">D#4/Eb4</option>
+                    <option value="64">E4</option>
+                    <option value="65">F4</option>
+                    <option value="66">F#4/Gb4</option>
+                    <option value="67">G4</option>
+                    <option value="68">G#4/Ab4</option>
                     <option value="69">A4</option>
-                    <!-- Add other notes as needed -->
+                    <option value="70">A#4/Bb4</option>
+                    <option value="71">B4</option>
+                    <option value="72">C5</option>
+                    <option value="73">C#5/Db5</option>
+                    <option value="74">D5</option>
+                    <option value="75">D#5/Eb5</option>
+                    <option value="76">E5</option>
+                    <option value="77">F5</option>
+                    <option value="78">F#5/Gb5</option>
+                    <option value="79">G5</option>
+                    <option value="80">G#5/Ab5</option>
+                    <option value="81">A5</option>
+                    <option value="82">A#5/Bb5</option>
+                    <option value="83">B5</option>
+                    <option value="84">C6</option>
+                    <option value="85">C#6/Db6</option>
+                    <option value="86">D6</option>
+                    <option value="87">D#6/Eb6</option>
+                    <option value="88">E6</option>
+                    <option value="89">F6</option>
+                    <option value="90">F#6/Gb6</option>
+                    <option value="91">G6</option>
+                    <option value="92">G#6/Ab6</option>
+                    <option value="93">A6</option>
+                    <option value="94">A#6/Bb6</option>
+                    <option value="95">B6</option>
+                    <option value="96">C7</option>
                 </select>
                 <label for="duration${noteIndex}">of duration</label>
                 <input type="number" id="duration${noteIndex}" name="duration${noteIndex}" min="1" max="32" value="1" required>
@@ -62,13 +119,19 @@
                 let note = noteContainer.querySelector('select').value;
                 let times = parseInt(noteContainer.querySelector('[id^="times"]').value);
                 let beats = parseInt(noteContainer.querySelector('[id^="beats"]').value);
-                let noteDuration = parseInt(noteContainer.querySelector('[id^="duration"]').value);
-
+                let noteDuration = 128*parseInt(noteContainer.querySelector('[id^="duration"]').value);
+                let timeOffset = 128*beats/times;
+                let noteEvents = [];
                 for (let i = 0; i < times; i++) {
-                    track.addEvent(new MidiWriter.NoteEvent({pitch: [note], duration: `T${noteDuration}`, wait: `T${beats}`}), function(event, index) {
-                        return {sequential:true};
-                    });
+                    noteEvents.push(new MidiWriter.NoteEvent({
+                        pitch: [note],
+                        duration: `T${noteDuration}`,
+                        wait: i === 0 ? 0 : `T${timeOffset}` // Only add wait time after the first note
+                    }));
                 }
+
+                // Add the array of NoteEvents as a single event with the sequence true
+                track.addEvent(noteEvents, {sequential: true});
             });
 
             var write = new MidiWriter.Writer([track]);
