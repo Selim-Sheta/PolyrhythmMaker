@@ -115,6 +115,7 @@
             track.setTempo(tempo);
             const notes = document.querySelectorAll('[id^="noteContainer"]');
             totalTime = tempo*duration/60;
+            let noteEvents = [];
             notes.forEach(noteContainer => {
                 let note = noteContainer.querySelector('select').value;
                 let times = parseInt(noteContainer.querySelector('[id^="times"]').value);
@@ -124,7 +125,7 @@
 
                 let currentTime = 0;
                 let repetition = 0;
-                let noteEvents = [];
+                
                 while(currentTime < totalTime){
                     noteEvents.push(new MidiWriter.NoteEvent({
                         pitch: [note],
@@ -135,11 +136,9 @@
                     repetition += 1;
                     currentTime = repetition*timeOffset;
                 }
-
-                // Add the array of NoteEvents as a single event with the sequence true
-                track.addEvent(noteEvents, {sequential: false});
             });
-
+            // Add the array of NoteEvents as a single event with the sequence true
+            track.addEvent(noteEvents, {sequential: false});
             var write = new MidiWriter.Writer([track]);
             var dataUri = write.dataUri();
             downloadMidi(dataUri);
