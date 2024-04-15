@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polyrhythm Generator</title>
     <script src="midiwriter.js"></script>
+    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
 </head>
 <body>
     <h1>Polyrhythm Generator</h1>
@@ -11,112 +12,131 @@
     <form id="polyrhythmForm">
         <h3>Global Settings</h3>
         <label for="tempo">Tempo (BPM):</label>
-        <input type="number" id="tempo" name="tempo" value="120" min="1" max="300" required>
+        <input type="number" onchange="generateMidi()" id="tempo" name="tempo" value="120" min="1" max="300" required>
         <label for="duration">Duration (seconds):</label>
-        <input type="number" id="duration" name="duration" value="30" min="1" max="600" required>
-        <button type="submit" onclick="generateMidi()">Download MIDI</button>
+        <input type="number" onchange="generateMidi()" id="duration" name="duration" value="30" min="1" max="600" required>
         <button type="button" onclick="addNote()">Add Note</button>
+        <button type="button" onclick="downloadMidi()">Download</button>
         <div id="noteInputs"></div> <!-- Container for dynamic note inputs -->
     </form>
 
+    <midi-player id="player" src="" sound-font></midi-player>
+
+    <midi-visualizer type="piano-roll" id="v_roll" src=""></midi-visualizer>
+
     <script>
+
+        let globalDataUri = "";
+
+        // Add a new note and its options to the container
         function addNote() {
             const container = document.getElementById('noteInputs');
+            const tempo = document.getElementById('tempo').value;
+            const duration = document.getElementById('duration').value;
+
+            let defaultPitch = 0;
+            let defaultOctave = 4;
+            let defaultDuration = 4;
+            let defaultVelocity = 70;
+            let defaultBeats = Math.floor(tempo*duration/60/2);
+            let defaultTimes = defaultBeats/2; // Initial default "times" value for the first note
+            
+            // Fetch the last note container added
+            const lastNoteContainer = container.querySelector('div[id^="noteContainer"]:last-child'); 
+            if (lastNoteContainer) {
+                // use last pitch + 1
+                const lastPitchSelect = lastNoteContainer.querySelector('select[id^="note"]');
+                if (lastPitchSelect) defaultPitch = (parseInt(lastPitchSelect.selectedIndex) + 1) % lastPitchSelect.options.length;
+                // use last octave
+                const lastOctaveInput = lastNoteContainer.querySelector('select[id^="octave"]');
+                if (lastOctaveInput) defaultOctave = parseInt(lastOctaveInput.value);
+                // use last duration
+                const lastDurationSelect = lastNoteContainer.querySelector('select[id^="duration"]');
+                if (lastDurationSelect) defaultDuration = parseInt(lastDurationSelect.selectedIndex);
+                // use last velocity
+                const lastVelocityInput = lastNoteContainer.querySelector('input[id^="velocity"]');
+                if (lastVelocityInput) defaultVelocity = parseInt(lastVelocityInput.value);
+                // use last times - 1
+                const lastTimesInput = lastNoteContainer.querySelector('input[id^="times"]');
+                if (lastTimesInput) defaultTimes = Math.max(1, parseInt(lastTimesInput.value) - 1);
+                // use last beats
+                const lastBeatsInput = lastNoteContainer.querySelector('input[id^="beats"]');
+                if (lastBeatsInput) defaultBeats = parseInt(lastBeatsInput.value);   
+            }
+
             const noteIndex = container.children.length + 1;
             const noteDiv = document.createElement('div');
             noteDiv.id = 'noteContainer' + noteIndex;
             noteDiv.innerHTML = `
-                <label for="note${noteIndex}">Note</label>
-                <select id="note${noteIndex}" name="note${noteIndex}">
-                    <option value="36">C2</option>
-                    <option value="37">C#2/Db2</option>
-                    <option value="38">D2</option>
-                    <option value="39">D#2/Eb2</option>
-                    <option value="40">E2</option>
-                    <option value="41">F2</option>
-                    <option value="42">F#2/Gb2</option>
-                    <option value="43">G2</option>
-                    <option value="44">G#2/Ab2</option>
-                    <option value="45">A2</option>
-                    <option value="46">A#2/Bb2</option>
-                    <option value="47">B2</option>
-                    <option value="48">C3</option>
-                    <option value="49">C#3/Db3</option>
-                    <option value="50">D3</option>
-                    <option value="51">D#3/Eb3</option>
-                    <option value="52">E3</option>
-                    <option value="53">F3</option>
-                    <option value="54">F#3/Gb3</option>
-                    <option value="55">G3</option>
-                    <option value="56">G#3/Ab3</option>
-                    <option value="57">A3</option>
-                    <option value="58">A#3/Bb3</option>
-                    <option value="59">B3</option>
-                    <option value="60">C4 (Middle C)</option>
-                    <option value="61">C#4/Db4</option>
-                    <option value="62">D4</option>
-                    <option value="63">D#4/Eb4</option>
-                    <option value="64">E4</option>
-                    <option value="65">F4</option>
-                    <option value="66">F#4/Gb4</option>
-                    <option value="67">G4</option>
-                    <option value="68">G#4/Ab4</option>
-                    <option value="69">A4</option>
-                    <option value="70">A#4/Bb4</option>
-                    <option value="71">B4</option>
-                    <option value="72">C5</option>
-                    <option value="73">C#5/Db5</option>
-                    <option value="74">D5</option>
-                    <option value="75">D#5/Eb5</option>
-                    <option value="76">E5</option>
-                    <option value="77">F5</option>
-                    <option value="78">F#5/Gb5</option>
-                    <option value="79">G5</option>
-                    <option value="80">G#5/Ab5</option>
-                    <option value="81">A5</option>
-                    <option value="82">A#5/Bb5</option>
-                    <option value="83">B5</option>
-                    <option value="84">C6</option>
-                    <option value="85">C#6/Db6</option>
-                    <option value="86">D6</option>
-                    <option value="87">D#6/Eb6</option>
-                    <option value="88">E6</option>
-                    <option value="89">F6</option>
-                    <option value="90">F#6/Gb6</option>
-                    <option value="91">G6</option>
-                    <option value="92">G#6/Ab6</option>
-                    <option value="93">A6</option>
-                    <option value="94">A#6/Bb6</option>
-                    <option value="95">B6</option>
-                    <option value="96">C7</option>
+                <label for="note${noteIndex}">Pitch</label>
+                <select id="note${noteIndex}" onchange="generateMidi()" name="note${noteIndex}">
+                    <option value="C">C</option>
+                    <option value="C#">C#/Db</option>
+                    <option value="D">D</option>
+                    <option value="D#">D#/Eb</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="F#">F#/Gb</option>
+                    <option value="G">G</option>
+                    <option value="G#">G#/Ab</option>
+                    <option value="A">A</option>
+                    <option value="A#">A#/Bb</option>
+                    <option value="B">B</option>
                 </select>
+
+                <label for="octave${noteIndex}">Octave</label>
+                <input type="number" onchange="generateMidi()" id="octave${noteIndex}" name="octave${noteIndex}" min="-2" max="8" value="${defaultOctave}" required>
                 
-                <label for="duration${noteIndex}">of duration</label>
-                <select id="duration${noteIndex}" name="duration${noteIndex}" value = "4" required>
+                <label for="duration${noteIndex}">Duration</label>
+                <select id="duration${noteIndex}" onchange="generateMidi()" name="duration${noteIndex}" required>
                     <option value="1">whole</option>
                     <option value="2">half</option>
                     <option value="d2">dotted half</option>
                     <option value="dd2">double dotted half</option>
-                    <option value="4">quarter</option>
+                    <option value="4" selected="selected">quarter</option>
+                    <option value="4t">quarter triplet</option>
+                    <option value="d4">dotted quarter</option>
+                    <option value="dd4">double dotted quarter</option>
+                    <option value="8">eighth</option>
+                    <option value="8t">eighth triplet</option>
+                    <option value="d8">dotted eighth</option>
+                    <option value="dd8">double dotted eighth</option>
+                    <option value="16">sixteenth</option>
+                    <option value="16t">sixteenth triplet</option>
+                    <option value="32">thirty-second</option>
+                    <option value="64">sixty-fourth</option>
                 </select>
+                
+                <label for="velocity${noteIndex}">Velocity</label>
+                <input type="number" onchange="generateMidi()" id="velocity${noteIndex}" name="velocity${noteIndex}" min="1" max="100" value="${defaultVelocity}" required>
 
-                <label for="times${noteIndex}">must play</label>
-                <input type="number" id="times${noteIndex}" name="times${noteIndex}" min="1" max="100" required>
-                <label for="beats${noteIndex}">times within</label>
-                <input type="number" id="beats${noteIndex}" name="beats${noteIndex}" min="1" max="100" value="20" required>
+                <label for="times${noteIndex}">| Must play</label>
+                <input type="number" onchange="generateMidi()" id="times${noteIndex}" name="times${noteIndex}" min="1" max="100" value="${defaultTimes}" required>
+
+                <label for="beats${noteIndex}">times every</label>
+                <input type="number" onchange="generateMidi()" id="beats${noteIndex}" name="beats${noteIndex}" min="1" max="100" value="${defaultBeats}" required>
                 
                 <label for="xbut${noteIndex}">beats</label>
-                <button type="button" id="xbut${noteIndex}" onclick="removeNote(${noteIndex})">Remove Note</button>
+                <button type="button" onchange="generateMidi()" id="xbut${noteIndex}" onclick="removeNote(${noteIndex})">X</button>
             `;
             container.appendChild(noteDiv);
+            // Set the default pitch selection
+            container.querySelector('div[id^="noteContainer"]:last-child').querySelector('select[id^="note"]').selectedIndex = defaultPitch;
+            // Set the default duration selection
+            container.querySelector('div[id^="noteContainer"]:last-child').querySelector('select[id^="duration"]').selectedIndex = defaultDuration;
+            generateMidi();
         }
 
+        // Remove a note
         function removeNote(index) {
             const noteToRemove = document.getElementById('noteContainer' + index);
             noteToRemove.remove();
+            generateMidi();
         }
 
+        // Generate the polyrhythm
         function generateMidi() {
+            event.preventDefault();
             var track = new MidiWriter.Track();
             const tempo = document.getElementById('tempo').value;
             const duration = document.getElementById('duration').value;
@@ -126,6 +146,9 @@
             let noteEvents = [];
             notes.forEach(noteContainer => {
                 let note = noteContainer.querySelector('[id^="note"]').value;
+                let octave = noteContainer.querySelector('[id^="octave"]').value;
+                note = note.concat(octave);
+                let volume = noteContainer.querySelector('[id^="velocity"]').value;
                 let times = parseInt(noteContainer.querySelector('[id^="times"]').value);
                 let beats = parseInt(noteContainer.querySelector('[id^="beats"]').value);
                 let noteDuration = noteContainer.querySelector('[id^="duration"]').value;
@@ -134,28 +157,36 @@
                 let currentTime = 0;
                 let repetition = 0;
                 
-                while(currentTime < totalTime){
+                while(currentTime < totalTime+1){
                     noteEvents.push(new MidiWriter.NoteEvent({
                         pitch: [note],
                         duration: noteDuration,
-                        tick: 128*currentTime,
-                        velocity: 100,
+                        tick: 1+128*currentTime,
+                        velocity: volume,
                         channel: 1
                     }));
                     repetition += 1;
                     currentTime = repetition*timeOffset;
                 }
             });
-            // Add the array of NoteEvents as a single event with the sequence true
+            // Add the array of NoteEvents as a single track event
             track.addEvent(noteEvents);
             var write = new MidiWriter.Writer([track]);
-            var dataUri = write.dataUri();
-            downloadMidi(dataUri);
+            globalDataUri = write.dataUri();
+
+            let player = document.getElementById("player")
+            let v_staff = document.getElementById("v_staff")
+            let v_roll = document.getElementById("v_roll")
+
+            player.src = write.dataUri()
+            v_roll.src = write.dataUri()
+            player.addVisualizer(v_roll);
         }
 
-        function downloadMidi(dataUri) {
+        // Save as midi file
+        function downloadMidi() {
             var link = document.createElement('a');
-            link.href = dataUri;
+            link.href = globalDataUri;
             link.download = 'polyrhythm.mid';
             document.body.appendChild(link);
             link.click();
