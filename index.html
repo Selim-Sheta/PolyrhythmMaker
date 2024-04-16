@@ -2,28 +2,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polyrhythm Generator</title>
+    <title>Polyrhythm Maker</title>
     <script src="midiwriter.js"></script>
     <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+    <link href="style.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Polyrhythm Generator</h1>
-    
-    <form id="polyrhythmForm">
-        <h3>Global Settings</h3>
-        <label for="tempo">Tempo (BPM):</label>
-        <input type="number" onchange="generateMidi()" id="tempo" name="tempo" value="120" min="1" max="300" required>
-        <label for="duration">Duration (seconds):</label>
-        <input type="number" onchange="generateMidi()" id="duration" name="duration" value="30" min="1" max="600" required>
-        <button type="button" onclick="addNote()">Add Note</button>
-        <button type="button" onclick="downloadMidi()">Download</button>
-        <div id="noteInputs"></div> <!-- Container for dynamic note inputs -->
-    </form>
+    <div class="mainContainer">
+        <h1>Polyrhythm Maker</h1>
 
-    <midi-player id="player" src="" sound-font></midi-player>
+        <form id="polyrhythmForm">
+            <div class="globalParameters">
+                <label for="tempo">Tempo (BPM):</label>
+                <input type="number" onchange="generateMidi()" id="tempo" name="tempo" value="120" min="1" max="300" required>
+                <label for="duration">Duration (seconds):</label>
+                <input type="number" onchange="generateMidi()" id="duration" name="duration" value="30" min="1" max="600" required>
+                <button type="button" onclick="addNote()">Add Note</button>
+                <button type="button" onclick="downloadMidi()">Download</button>
+            </div>
+            <div id="noteInputs"></div> <!-- Container for dynamic note inputs -->
+        </form>
 
-    <midi-visualizer type="piano-roll" id="v_roll" src=""></midi-visualizer>
+        <midi-player id="player" src="" sound-font></midi-player>
 
+        <midi-visualizer type="piano-roll" id="v_roll" src=""></midi-visualizer>
+    </div>
     <script>
 
         let globalDataUri = "";
@@ -67,6 +70,7 @@
             const noteIndex = container.children.length + 1;
             const noteDiv = document.createElement('div');
             noteDiv.id = 'noteContainer' + noteIndex;
+            noteDiv.className = 'noteContainer'
             noteDiv.innerHTML = `
                 <label for="note${noteIndex}">Pitch</label>
                 <select id="note${noteIndex}" onchange="generateMidi()" name="note${noteIndex}">
@@ -91,18 +95,9 @@
                 <select id="duration${noteIndex}" onchange="generateMidi()" name="duration${noteIndex}" required>
                     <option value="1">whole</option>
                     <option value="2">half</option>
-                    <option value="d2">dotted half</option>
-                    <option value="dd2">double dotted half</option>
                     <option value="4" selected="selected">quarter</option>
-                    <option value="4t">quarter triplet</option>
-                    <option value="d4">dotted quarter</option>
-                    <option value="dd4">double dotted quarter</option>
                     <option value="8">eighth</option>
-                    <option value="8t">eighth triplet</option>
-                    <option value="d8">dotted eighth</option>
-                    <option value="dd8">double dotted eighth</option>
                     <option value="16">sixteenth</option>
-                    <option value="16t">sixteenth triplet</option>
                     <option value="32">thirty-second</option>
                     <option value="64">sixty-fourth</option>
                 </select>
@@ -116,7 +111,7 @@
                 <label for="beats${noteIndex}">times every</label>
                 <input type="number" onchange="generateMidi()" id="beats${noteIndex}" name="beats${noteIndex}" min="1" max="100" value="${defaultBeats}" required>
                 
-                <label for="xbut${noteIndex}">beats</label>
+                <label for="xbut${noteIndex}">beats.</label>
                 <button type="button" onchange="generateMidi()" id="xbut${noteIndex}" onclick="removeNote(${noteIndex})">X</button>
             `;
             container.appendChild(noteDiv);

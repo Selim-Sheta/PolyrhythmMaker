@@ -1,0 +1,117 @@
+:root {
+    --text: #032319;
+    --background: #fafffd;
+    --primary: #2d5c4e;
+    --secondary: #af9ad6;
+    --accent: #f2b44e;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    padding: 20px;
+    margin: 0;
+    
+}
+
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Optional: if you also want vertical centering */
+}
+
+h1, h3 {
+    color: var(--primary);
+}
+
+form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    overflow-x: hidden;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Optional: if you also want vertical centering */
+}
+
+label {
+    margin: 5px 0 5px;
+}
+
+input[type="number"],
+select {
+    padding: 8px;
+    margin: 5px 0 5px;
+    border: 1px solid var(--secondary);
+    border-radius: 4px;
+    box-sizing: border-box; /* Makes padding not affect width */
+}
+
+button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+button:hover {
+    background-color: var(--accent);
+}
+
+#noteInputs {
+    width: 100%; /* Ensures the container spans the full width of its parent */
+    overflow-x: auto; /* Enables horizontal scrolling when content overflows */
+    margin-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Optional: if you also want vertical centering */
+}
+
+#noteInputs label,
+#noteInputs input,
+#noteInputs select {
+    display: inline-block;
+    width: auto;
+    margin-right: 10px;
+}
+
+#noteInputs button {
+    background-color: var(--secondary);
+}
+
+#noteInputs button:hover {
+    background-color: var(--accent);
+}
+
+.noteContainer {
+    display: inline-block;
+    font-size: 14px;
+    border-top: 1px solid var(--secondary);
+    white-space: nowrap; /* Prevents items from wrapping to the next line */
+}
+
+midi-player {
+    display: block;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+midi-visualizer {
+    display: block;
+    margin-top: 20px;
+    max-width: 100%;
+}
