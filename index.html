@@ -9,31 +9,41 @@
 </head>
 <body>
     <div class="mainContainer">
-        <h1>Polyrhythm Maker</h1>
-
         <form id="polyrhythmForm">
+            <h1>Polyrhythm Maker</h1>
+            <h3>Selim Sheta 2024</h3>
             <div class="globalParameters">
                 <label for="tempo">Tempo (BPM):</label>
                 <input type="number" onchange="generateMidi()" id="tempo" name="tempo" value="120" min="1" max="300" required>
                 <label for="duration">Duration (seconds):</label>
                 <input type="number" onchange="generateMidi()" id="duration" name="duration" value="30" min="1" max="600" required>
+                
+            </div>
+            <div class="globalParameters">
                 <button type="button" onclick="addNote()">Add Note</button>
                 <button type="button" onclick="downloadMidi()">Download</button>
             </div>
-            <div id="noteInputs"></div> <!-- Container for dynamic note inputs -->
+            <div id="noteInputs">
+                <i id ="defaultMessage">Notes will appear here as you add them.</i>
+            </div> <!-- Container for dynamic note inputs -->
         </form>
-
+        <i id="info">P = pitch, O = octave, D = duration, V = velocity</i>
         <midi-player id="player" src="" sound-font></midi-player>
-
         <midi-visualizer type="piano-roll" id="v_roll" src=""></midi-visualizer>
+        
     </div>
     <script>
 
         let globalDataUri = "";
-
+        let player = document.getElementById("player")
+        let v_staff = document.getElementById("v_staff")
+        let v_roll = document.getElementById("v_roll")
+        let container = document.getElementById('noteInputs');
+        let defaultMessage = document.getElementById('defaultMessage');
+        let numNotes = 0;
         // Add a new note and its options to the container
         function addNote() {
-            const container = document.getElementById('noteInputs');
+            if (defaultMessage) defaultMessage.remove();
             const tempo = document.getElementById('tempo').value;
             const duration = document.getElementById('duration').value;
 
@@ -43,7 +53,7 @@
             let defaultVelocity = 70;
             let defaultBeats = Math.floor(tempo*duration/60/2);
             let defaultTimes = defaultBeats/2; // Initial default "times" value for the first note
-            
+
             // Fetch the last note container added
             const lastNoteContainer = container.querySelector('div[id^="noteContainer"]:last-child'); 
             if (lastNoteContainer) {
@@ -72,7 +82,9 @@
             noteDiv.id = 'noteContainer' + noteIndex;
             noteDiv.className = 'noteContainer'
             noteDiv.innerHTML = `
-                <label for="note${noteIndex}">Pitch</label>
+                <button type="button" onchange="generateMidi()" id="xbut${noteIndex}" onclick="removeNote(${noteIndex})">X</button>
+                
+                <label for="note${noteIndex}">P</label>
                 <select id="note${noteIndex}" onchange="generateMidi()" name="note${noteIndex}">
                     <option value="C">C</option>
                     <option value="C#">C#/Db</option>
@@ -88,10 +100,10 @@
                     <option value="B">B</option>
                 </select>
 
-                <label for="octave${noteIndex}">Octave</label>
+                <label for="octave${noteIndex}">O</label>
                 <input type="number" onchange="generateMidi()" id="octave${noteIndex}" name="octave${noteIndex}" min="-2" max="8" value="${defaultOctave}" required>
                 
-                <label for="duration${noteIndex}">Duration</label>
+                <label for="duration${noteIndex}">D</label>
                 <select id="duration${noteIndex}" onchange="generateMidi()" name="duration${noteIndex}" required>
                     <option value="1">whole</option>
                     <option value="2">half</option>
@@ -102,7 +114,7 @@
                     <option value="64">sixty-fourth</option>
                 </select>
                 
-                <label for="velocity${noteIndex}">Velocity</label>
+                <label for="velocity${noteIndex}">V</label>
                 <input type="number" onchange="generateMidi()" id="velocity${noteIndex}" name="velocity${noteIndex}" min="1" max="100" value="${defaultVelocity}" required>
 
                 <label for="times${noteIndex}">| Must play</label>
@@ -110,15 +122,18 @@
 
                 <label for="beats${noteIndex}">times every</label>
                 <input type="number" onchange="generateMidi()" id="beats${noteIndex}" name="beats${noteIndex}" min="1" max="100" value="${defaultBeats}" required>
-                
-                <label for="xbut${noteIndex}">beats.</label>
-                <button type="button" onchange="generateMidi()" id="xbut${noteIndex}" onclick="removeNote(${noteIndex})">X</button>
+
+                <label for="end${noteIndex}">beats.</label>
+                <div><id ="${noteIndex}"></div>
             `;
             container.appendChild(noteDiv);
             // Set the default pitch selection
-            container.querySelector('div[id^="noteContainer"]:last-child').querySelector('select[id^="note"]').selectedIndex = defaultPitch;
+            noteDiv.querySelector('select[id^="note"]').selectedIndex = defaultPitch;
             // Set the default duration selection
-            container.querySelector('div[id^="noteContainer"]:last-child').querySelector('select[id^="duration"]').selectedIndex = defaultDuration;
+            noteDiv.querySelector('select[id^="duration"]').selectedIndex = defaultDuration;
+            // remove border from top note container
+            container.querySelector('div[id^="noteContainer"]:first-child').style.borderTop = "none";
+            numNotes += 1;
             generateMidi();
         }
 
@@ -126,12 +141,21 @@
         function removeNote(index) {
             const noteToRemove = document.getElementById('noteContainer' + index);
             noteToRemove.remove();
+            numNotes -= 1;
+            // remove border from top note container
+            if (numNotes > 0) container.querySelector('div[id^="noteContainer"]:first-child').style.borderTop = "none";
+            
+            if (numNotes == 0){
+                defaultMessage = document.createElement('div');
+                defaultMessage.innerHTML = `<i id ="defaultMessage">Notes will appear here as you add them.</i>`;
+                container.appendChild(defaultMessage);
+            }
             generateMidi();
         }
 
         // Generate the polyrhythm
         function generateMidi() {
-            event.preventDefault();
+            if(event) event.preventDefault();
             var track = new MidiWriter.Track();
             const tempo = document.getElementById('tempo').value;
             const duration = document.getElementById('duration').value;
@@ -168,11 +192,6 @@
             track.addEvent(noteEvents);
             var write = new MidiWriter.Writer([track]);
             globalDataUri = write.dataUri();
-
-            let player = document.getElementById("player")
-            let v_staff = document.getElementById("v_staff")
-            let v_roll = document.getElementById("v_roll")
-
             player.src = write.dataUri()
             v_roll.src = write.dataUri()
             player.addVisualizer(v_roll);

@@ -2,8 +2,8 @@
     --text: #032319;
     --background: #fafffd;
     --primary: #2d5c4e;
-    --secondary: #af9ad6;
-    --accent: #f2b44e;
+    --secondary: #626262;
+    --accent: #f05477;
 }
 
 body {
@@ -11,8 +11,6 @@ body {
     background-color: var(--background);
     color: var(--text);
     padding: 20px;
-    margin: 0;
-    
 }
 
 .mainContainer {
@@ -23,28 +21,24 @@ body {
 }
 
 h1, h3 {
+    margin: 0;
     color: var(--primary);
 }
 
 form {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    margin-top: 20px;
-    overflow-x: hidden;
-    max-height: 600px;
     display: flex;
     flex-direction: column;
     justify-content: center; /* Centers content horizontally */
     align-items: center; /* Optional: if you also want vertical centering */
+    width: 100%;
+    margin-bottom: 5px;
 }
 
 label {
     margin: 5px 0 5px;
 }
 
-input[type="number"],
+input,
 select {
     padding: 8px;
     margin: 5px 0 5px;
@@ -69,31 +63,25 @@ button:hover {
     background-color: var(--accent);
 }
 
-#noteInputs {
-    width: 100%; /* Ensures the container spans the full width of its parent */
-    overflow-x: auto; /* Enables horizontal scrolling when content overflows */
-    margin-top: 10px;
-    padding-bottom: 10px;
+.globalParameters {
+    margin-top: 5px;
+    display: inline-block;
+    white-space: nowrap; /* Prevents items from wrapping to the next line */
+}
+
+#noteInputs{
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    overflow: auto;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centers content horizontally */
-    align-items: center; /* Optional: if you also want vertical centering */
-}
-
-#noteInputs label,
-#noteInputs input,
-#noteInputs select {
-    display: inline-block;
-    width: auto;
-    margin-right: 10px;
-}
-
-#noteInputs button {
-    background-color: var(--secondary);
-}
-
-#noteInputs button:hover {
-    background-color: var(--accent);
+    justify-content: flex-start; /* Centers content horizontally */
+    align-items: flex-start; /* Optional: if you also want vertical centering */
+    max-height: 550px;
+    max-width: 100%;
 }
 
 .noteContainer {
@@ -103,15 +91,46 @@ button:hover {
     white-space: nowrap; /* Prevents items from wrapping to the next line */
 }
 
+.noteContainer label,
+.noteContainer input,
+.noteContainer select {
+    display: inline-block;
+    width: auto;
+    max-width: 85px;
+    margin-right: 10px;
+}
+
+.noteContainer button {
+    background-color: var(--secondary);
+    width: 30px;
+    height: 30px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+    margin: 0 10px 0 0;
+}
+
+.noteContainer button:hover {
+    background-color: var(--accent);
+}
+
 midi-player {
     display: block;
     margin-top: 20px;
     width: 100%;
     max-width: 600px;
+    background-color: transparent;
+    backdrop-filter: drop-shadow(0 0 2px rgba(0,0,0,0.1))
 }
 
 midi-visualizer {
     display: block;
     margin-top: 20px;
     max-width: 100%;
+}
+
+#info {
+    margin: 0px 0px 10px;
+    padding: 0;
+    text-align: center;
 }
