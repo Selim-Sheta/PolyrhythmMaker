@@ -23,11 +23,16 @@
                 <button type="button" onclick="addNote()">Add Note</button>
                 <button type="button" onclick="downloadMidi()">Download</button>
             </div>
-            <div id="noteInputs">
+            
+            <div id="noteInputs"> <!-- Container for dynamic note inputs -->
                 <i id ="defaultMessage">Notes will appear here as you add them.</i>
-            </div> <!-- Container for dynamic note inputs -->
+            </div> 
         </form>
         <i id="info">P = pitch, O = octave, D = duration, V = velocity</i>
+        <div id = "updateMessage"> 
+            <label for="updateButton">Midi file is too large to update in real time.</label>
+            <button id = "updateButton" type="button" onclick="update()">Update</button>
+        </div> 
         <midi-player id="player" src="" sound-font></midi-player>
         <midi-visualizer type="piano-roll" id="v_roll" src=""></midi-visualizer>
         
@@ -41,6 +46,7 @@
         let container = document.getElementById('noteInputs');
         let defaultMessage = document.getElementById('defaultMessage');
         let updateMessage = document.getElementById('updateMessage');
+        let updateButton = document.getElementById('updateButton');
         let numNotes = 0;
         // Add a new note and its options to the container
         function addNote() {
@@ -134,7 +140,7 @@
             // Set the default duration selection
             noteDiv.querySelector('select[id^="duration"]').selectedIndex = defaultDuration;
             // remove border from top note container
-            let firstNoteContainer = container.querySelector('div[id^="noteContainer"]:first-child');
+            let firstNoteContainer = container.querySelectorAll('div[id^="noteContainer"]')[0];
             if(firstNoteContainer) firstNoteContainer.style.borderTop = "none";
             generateMidi();
         }
@@ -145,7 +151,7 @@
             noteToRemove.remove();
             numNotes -= 1;
             if (numNotes > 0) {
-                let firstNoteContainer = container.querySelector('div[id^="noteContainer"]:first-child');
+                let firstNoteContainer = container.querySelector('div[id^="noteContainer"]')[0];
                 if(firstNoteContainer) firstNoteContainer.style.borderTop = "none";
             } else {
                 // Show default message
@@ -191,11 +197,28 @@
             });
             // Add the array of NoteEvents as a single track event
             track.addEvent(noteEvents);
-            var write = new MidiWriter.Writer([track]);
-            globalDataUri = write.dataUri();
-            player.src = write.dataUri()
-            v_roll.src = write.dataUri()
-            player.addVisualizer(v_roll);
+            // Auto update if the number of notes is reasonable
+            if (noteEvents.length < 2000) {
+                update();
+                updateMessage.style.display = "none";
+            } else {
+                updateMessage.style.display = "initial";
+            }
+        }
+
+        // push the midi track to the dataUri
+        function update(){
+            updateButton.textContent = "Loading...";
+            // Defer the execution of the heavy task
+            setTimeout(function() {
+                var write = new MidiWriter.Writer([track]);
+                globalDataUri = write.dataUri();
+                player.src = globalDataUri;  // Update only once
+                v_roll.src = globalDataUri;
+                player.addVisualizer(v_roll);
+
+                updateButton.textContent = "Update";
+            }, 0); // setTimeout with delay of 0 ms
         }
 
         // Save as midi file
