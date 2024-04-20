@@ -33,17 +33,18 @@
         
     </div>
     <script>
-
         let globalDataUri = "";
+        let track = "";
         let player = document.getElementById("player")
         let v_staff = document.getElementById("v_staff")
         let v_roll = document.getElementById("v_roll")
         let container = document.getElementById('noteInputs');
         let defaultMessage = document.getElementById('defaultMessage');
+        let updateMessage = document.getElementById('updateMessage');
         let numNotes = 0;
         // Add a new note and its options to the container
         function addNote() {
-            if (defaultMessage) defaultMessage.remove();
+            defaultMessage.style.display = "none";
             const tempo = document.getElementById('tempo').value;
             const duration = document.getElementById('duration').value;
 
@@ -127,6 +128,7 @@
                 <div><id ="${noteIndex}"></div>
             `;
             container.appendChild(noteDiv);
+            numNotes += 1;
             // Set the default pitch selection
             noteDiv.querySelector('select[id^="note"]').selectedIndex = defaultPitch;
             // Set the default duration selection
@@ -155,7 +157,7 @@
         // Generate the polyrhythm
         function generateMidi() {
             if(event) event.preventDefault();
-            var track = new MidiWriter.Track();
+            track = new MidiWriter.Track();
             const tempo = document.getElementById('tempo').value;
             const duration = document.getElementById('duration').value;
             track.setTempo(tempo);
