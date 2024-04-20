@@ -66,7 +66,7 @@ button:hover {
 .globalParameters {
     margin-top: 5px;
     display: inline-block;
-    white-space: nowrap; /* Prevents items from wrapping to the next line */
+    flex-wrap: wrap;
 }
 
 #noteInputs{
@@ -133,4 +133,8 @@ midi-visualizer {
     margin: 0px 0px 10px;
     padding: 0;
     text-align: center;
+}
+
+#manualUpdate{
+    display: none;
 }

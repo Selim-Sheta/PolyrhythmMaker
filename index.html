@@ -13,9 +13,9 @@
             <h1>Polyrhythm Maker</h1>
             <h3>Selim Sheta 2024</h3>
             <div class="globalParameters">
-                <label for="tempo">Tempo (BPM):</label>
+                <label for="tempo">Tempo (BPM)</label>
                 <input type="number" onchange="generateMidi()" id="tempo" name="tempo" value="120" min="1" max="300" required>
-                <label for="duration">Duration (seconds):</label>
+                <label for="duration">Duration (sec)</label>
                 <input type="number" onchange="generateMidi()" id="duration" name="duration" value="30" min="1" max="600" required>
                 
             </div>
@@ -49,7 +49,7 @@
 
             let defaultPitch = 0;
             let defaultOctave = 4;
-            let defaultDuration = 4;
+            let defaultDuration = 2;
             let defaultVelocity = 70;
             let defaultBeats = Math.floor(tempo*duration/60/2);
             let defaultTimes = defaultBeats/2; // Initial default "times" value for the first note
