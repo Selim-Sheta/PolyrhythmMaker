@@ -135,6 +135,6 @@ midi-visualizer {
     text-align: center;
 }
 
-#manualUpdate{
+#updateMessage{
     display: none;
 }

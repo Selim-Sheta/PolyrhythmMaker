@@ -132,8 +132,8 @@
             // Set the default duration selection
             noteDiv.querySelector('select[id^="duration"]').selectedIndex = defaultDuration;
             // remove border from top note container
-            container.querySelector('div[id^="noteContainer"]:first-child').style.borderTop = "none";
-            numNotes += 1;
+            let firstNoteContainer = container.querySelector('div[id^="noteContainer"]:first-child');
+            if(firstNoteContainer) firstNoteContainer.style.borderTop = "none";
             generateMidi();
         }
 
@@ -142,13 +142,12 @@
             const noteToRemove = document.getElementById('noteContainer' + index);
             noteToRemove.remove();
             numNotes -= 1;
-            // remove border from top note container
-            if (numNotes > 0) container.querySelector('div[id^="noteContainer"]:first-child').style.borderTop = "none";
-            
-            if (numNotes == 0){
-                defaultMessage = document.createElement('div');
-                defaultMessage.innerHTML = `<i id ="defaultMessage">Notes will appear here as you add them.</i>`;
-                container.appendChild(defaultMessage);
+            if (numNotes > 0) {
+                let firstNoteContainer = container.querySelector('div[id^="noteContainer"]:first-child');
+                if(firstNoteContainer) firstNoteContainer.style.borderTop = "none";
+            } else {
+                // Show default message
+                defaultMessage.style.display = "initial";
             }
             generateMidi();
         }
