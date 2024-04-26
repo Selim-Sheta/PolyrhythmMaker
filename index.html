@@ -3,6 +3,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polyrhythm Maker</title>
+    <meta name="description" content="Create complex polyrhythms easily with this free online tool. Customize tempo, duration, and download your MIDI files instantly.">
+    <meta name="keywords" content="Polyrhythm, Online Polyrhythm Generator, Free MIDI Maker, Create MIDI, Download MIDI">
     <script src="midiwriter.js"></script>
     <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
     <link href="style.css" rel="stylesheet">
@@ -11,7 +13,7 @@
     <div class="mainContainer">
         <form id="polyrhythmForm">
             <h1>Polyrhythm Maker</h1>
-            <h3>Selim Sheta 2024</h3>
+            <h2>Create and download your own polyrhythms.</h2>
             <div class="globalParameters">
                 <label for="tempo">Tempo (BPM)</label>
                 <input type="number" onchange="generateMidi()" id="tempo" name="tempo" value="120" min="1" max="300" required>
@@ -23,7 +25,6 @@
                 <button type="button" onclick="addNote()">Add Note</button>
                 <button type="button" onclick="downloadMidi()">Download</button>
             </div>
-            
             <div id="noteInputs"> <!-- Container for dynamic note inputs -->
                 <i id ="defaultMessage">Notes will appear here as you add them.</i>
             </div> 
@@ -35,7 +36,9 @@
         </div> 
         <midi-player id="player" src="" sound-font></midi-player>
         <midi-visualizer type="piano-roll" id="v_roll" src=""></midi-visualizer>
-        
+        <footer>
+            <p>© 2024 Selim Sheta - Free Online Polyrhythm Maker & Midi Generator</p>
+        </footer>
     </div>
     <script>
         let globalDataUri = "";

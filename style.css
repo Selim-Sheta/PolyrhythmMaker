@@ -20,9 +20,14 @@ body {
     align-items: center; /* Optional: if you also want vertical centering */
 }
 
-h1, h3 {
+h1, h2, h3 {
     margin: 0;
     color: var(--primary);
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.17em;
 }
 
 form {
@@ -138,4 +143,8 @@ midi-visualizer {
 #updateMessage{
     color: var(--accent);
     display: none;
+}
+
+footer{
+    text-align:center;
 }
